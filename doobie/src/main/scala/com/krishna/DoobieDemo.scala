@@ -1,10 +1,13 @@
 package com.krishna
 
+import cats.data.NonEmptyList
 import cats.effect.{ ExitCode, IO, IOApp }
 import com.krishna.model.Actor
+import com.krishna.util.Helper.Debugger
 import doobie.implicits._
+import doobie.util.fragment.Fragment
 import doobie.util.transactor.Transactor
-import doobie.{ HC, HPS }
+import doobie.{ Fragments, HC, HPS }
 
 object DoobieDemo extends IOApp {
 
@@ -47,8 +50,26 @@ object DoobieDemo extends IOApp {
     HC.stream[Actor](
       queryString,
       HPS.set(name),
-      100
+      100 // maximum number of rows to be fetched at a time
     ).compile.toList.map(_.headOption).transact(xa)
+  }
+
+  // Lower Level API
+  // Fragments
+  // Fragments are helpful to build queries dynamically
+  def findActorsByInitial(letter: String): IO[List[Actor]] = {
+    val selectPart = fr"select id, name"
+    val fromPart = fr"from actors"
+    val wherePart = fr"where LEFT(name, 1) = $letter"
+
+    val statement = selectPart ++ fromPart ++ wherePart
+    statement.query[Actor].stream.compile.toList.transact(xa)
+  }
+
+  def findActorsByNamesProgram(actorsNames: NonEmptyList[String]): IO[List[Actor]] = {
+    val sqlStatement: Fragment =
+      fr"select id, name from actors where " ++ Fragments.in(fr"name", actorsNames) // name IN (...)
+    sqlStatement.query[Actor].stream.compile.toList.transact(xa)
   }
 
   override def run(args: List[String]): IO[ExitCode] = {
@@ -57,7 +78,8 @@ object DoobieDemo extends IOApp {
     // findActorById(1).debug.as(ExitCode.Success)
     // findActorByIdOption(99).debug.as(ExitCode.Success) // will return None
     // findActorNamesStream.debug.as(ExitCode.Success)
-    findActorByName("Henry Cavill").as(ExitCode.Success)
+    // findActorByName("Henry Cavill").as(ExitCode.Success)
+    findActorsByInitial("H").debug.as(ExitCode.Success)
   }
 
 }
