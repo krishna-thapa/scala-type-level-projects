@@ -5,11 +5,12 @@ ThisBuild / organization := "com.krishna"
 ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / version := "0.1"
 
-lazy val root = (project in file(".")).aggregate(doobie, fs2)
+lazy val root = (project in file(".")).aggregate(doobie, fs2, cats)
 
 val DoobieVersion = "1.0.0-RC1"
 val NewTypeVersion = "0.4.4"
 val Fs2Version = "3.2.4"
+val catsVersion = "2.7.0"
 
 lazy val doobie = project
   .settings(
@@ -29,6 +30,14 @@ lazy val fs2 = project
     name := "fs2",
     libraryDependencies ++= Seq(
       "co.fs2" %% "fs2-core" % Fs2Version
+    )
+  )
+
+lazy val cats = project
+  .settings(
+    name := "cats",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % catsVersion,
     )
   )
 
