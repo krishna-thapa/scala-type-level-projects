@@ -16,7 +16,9 @@ lazy val doobie = project
     libraryDependencies ++= Seq(
       "org.tpolecat" %% "doobie-core" % DoobieVersion,
       "org.tpolecat" %% "doobie-postgres" % DoobieVersion,
-      "org.tpolecat" %% "doobie-hikari" % DoobieVersion
+      "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
+      "org.slf4j" % "slf4j-api" % "1.7.36",
+      "org.slf4j" % "slf4j-simple" % "1.7.36"
       //"io.estatico" %% "newtype" % NewTypeVersion
     )
   )
