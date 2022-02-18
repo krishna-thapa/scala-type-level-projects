@@ -1,23 +1,16 @@
-package com.krishna
+package com.krishna.part1
 
 import cats.data.NonEmptyList
 import cats.effect.{ ExitCode, IO, IOApp }
 import com.krishna.model.Actor
+import com.krishna.util.GetTransactor
 import com.krishna.util.Helper.Debugger
 import doobie.implicits._
 import doobie.util.fragment.Fragment
-import doobie.util.transactor.Transactor
 import doobie.util.update.Update
 import doobie.{ Fragments, HC, HPS }
 
-object DoobieDemo extends IOApp {
-
-  val xa: Transactor[IO] = Transactor.fromDriverManager[IO](
-    driver = "org.postgresql.Driver",
-    url = "jdbc:postgresql:myimdb",
-    user = "docker",
-    pass = "docker"
-  )
+object DoobiePart1 extends IOApp with GetTransactor {
 
   def findAllActorNames: IO[List[String]] = {
     val query = sql"select name from actors".query[String]
