@@ -2,9 +2,9 @@ package com.krishna
 
 import cats.effect.{ ExitCode, IO, IOApp }
 import com.krishna.model.Actor
-import com.krishna.util.Helper.Debugger
 import doobie.implicits._
 import doobie.util.transactor.Transactor
+import doobie.{ HC, HPS }
 
 object DoobieDemo extends IOApp {
 
@@ -33,11 +33,31 @@ object DoobieDemo extends IOApp {
     action.transact(xa)
   }
 
+  // Use of Stream instead of getting all the lest of String at once but have compiled here to print
+  // the content to console
+  def findActorNamesStream: IO[List[String]] = {
+    sql"select name from actors".query[String].stream.compile.toList.transact(xa)
+  }
+
+  // Lower Level API
+  // HC -> High Level Connection
+  // HPS -> High Level Prepared Statement
+  def findActorByName(name: String): IO[Option[Actor]] = {
+    val queryString = "select id, name from actors where name = ?"
+    HC.stream[Actor](
+      queryString,
+      HPS.set(name),
+      100
+    ).compile.toList.map(_.headOption).transact(xa)
+  }
+
   override def run(args: List[String]): IO[ExitCode] = {
-    //IO(println("Hello, doobie")).as(ExitCode.Success)
-    //finaAllActorNames.debug.as(ExitCode.Success)
-    //findActorById(1).debug.as(ExitCode.Success)
-    findActorByIdOption(99).debug.as(ExitCode.Success) // will return None
+    // IO(println("Hello, doobie")).as(ExitCode.Success)
+    // finaAllActorNames.debug.as(ExitCode.Success)
+    // findActorById(1).debug.as(ExitCode.Success)
+    // findActorByIdOption(99).debug.as(ExitCode.Success) // will return None
+    // findActorNamesStream.debug.as(ExitCode.Success)
+    findActorByName("Henry Cavill").as(ExitCode.Success)
   }
 
 }
