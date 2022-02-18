@@ -117,6 +117,10 @@ object DoobieDemo extends IOApp {
     sql"update actors set name = $name where id = 9".update.run.transact(xa)
   }
 
+  def deleteJerry(): IO[Int] = {
+    sql"delete from actors where id = 9".update.run.transact(xa)
+  }
+
   override def run(args: List[String]): IO[ExitCode] = {
     // IO(println("Hello, doobie")).as(ExitCode.Success)
     // finaAllActorNames.debug.as(ExitCode.Success)
@@ -128,7 +132,7 @@ object DoobieDemo extends IOApp {
     // saveActor(99, "Hello World").debug.as(ExitCode.Success)
     // saveMultipleActors(List("Bob", "James")).debug.as(ExitCode.Success)
     // saveAndGetActorProgram("Jerry").debug.as(ExitCode.Success)
-    updateJerryName().debug.as(ExitCode.Success)
+    deleteJerry().debug.as(ExitCode.Success)
   }
 
 }
