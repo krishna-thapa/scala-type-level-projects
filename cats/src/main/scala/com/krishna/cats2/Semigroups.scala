@@ -1,6 +1,6 @@
 package com.krishna.cats2
 
-object CatsSemigroups {
+object Semigroups {
 
   // Semigroups COMBINE elements of the same type
 
